@@ -6,85 +6,175 @@ def try_again():
     else:
         return False
 
-def main(input_string):
-    # initializing strings to store characters
-    whole_number = ''
-    decimal_nums = ''
-    power = ''
-    num = [len(input_string)]
-    # initializing variables to determine state
-    i = 0
-    index = 0
-    current_index = 0
-    character_count = 0
-    dot = False
-    last_index = len(input_string) - 1
-    state = "accepted"
-    previous = "q"
 
+# Python3 program to implement DFS that accepts
+# all Stringing which follow the language
+# L = {a ^ n b ^ m (n)mod 2 = 0, m>= 1 }
 
-    while i < len(input_string) and state == "accepted":
-        previous_char, num[i], index, state = check_state(previous, input_string[i], i, last_index)
-        i= i + 1
-
-        if state != "accepted":
-           print("sorry that is not a java floating point literal")
-           break
-
-    return try_again()
-
-
-def check_state(previous, character, index, last):
-    # Dictionary of accept states
+# This function is for the dfa = starting state
+# dfa = state (zeroth) of DFA
+def start(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
-                   "7": 7, "8": 8, "9": 9, ".": "."}
-    accept_chars = {"+": "+", "-": "-", "e": "E"}
-    accept_EXT = {"f": "f", "F": "F"}
-
-    if character in accept_nums and pre:
-        return accept_chars[character], index, "accepted"
-    elif character == "_" and index != 0:
-        return "", index, "accepted"
-    elif character in accept_chars and index != 0:
-        return accept_chars[character], index, "accepted"
-    elif character in accept_EXT and index == last:
-        return 0, index, "accepted"
+                   "7": 7, "8": 8, "9": 9, "_": "_"}
+    if c in accept_nums:
+        dfa = 1
+    elif c == ".":
+        dfa = 4
+    # -1 is used to check for any
+    # invalid symbol
     else:
-        return 0, index, "not accepted"
-
-    return "not accepted"
-
+        dfa = -1
+    return dfa
 
 
-#Dfa for accepting only 001+00101001
-dfa={0:{"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
-                   "7": 7, "8": 8, "9": 9, ".": ".", "_": "_"},
-       1:{"e": "E"},
-       2:{"+": "+", "-": "-", "0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5,
-          "6": 6, "7": 7, "8": 8, "9": 9},
-       3:{"f": "f", "F": "F"}
+# This function is for the next state after the start state
+# dfa = state of DFA
+def state1(c):
+    dot = "."
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9, "_": "_"}
+    accept_chars = {"e": "E"}
+    accept_end = {"f": "f", "F": "F"}
+    if c in accept_nums:
+        dfa = 1
+    elif c == dot:
+        dfa = 4
+    elif c in accept_chars:
+        dfa = 3
+    elif c in accept_end:
+        dfa = 5
+    else:
+        dfa = -1
+    return dfa
+
+
+# This function next state if previous state was a "."
+# dfa = state of DFA
+def state2(c):
+
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    accept_chars = {"e": "E"}
+    accept_end = {"f": "f", "F": "F"}
+    if c in accept_nums:
+        dfa = 2
+    elif c in accept_chars:
+        dfa = 3
+    elif c in accept_end:
+        dfa = 5
+    else:
+        dfa = -1
+    return dfa
 
 
 
-def accepts(transitions,initial,accepting,s):
-    state = initial
-    try:
-        for c in s:
-            state = transitions[state][c]
-        if(state in accepting):
-            return 'Accepted'
+# This function is for the third
+# dfa = state of DFA
+def state3(c):
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    accept_operators = {"+": "+", "-": "-"}
+    if c in accept_operators:
+        dfa = 4
+    elif c in accept_nums:
+        dfa = 5
+    else:
+        dfa = -1
+    return dfa
+
+
+# dfa if number was found after decimal
+def state4(c):
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    accept_end = {"f": "f", "F": "F"}
+    if c in accept_nums:
+        dfa = 2
+    elif c in accept_end:
+        dfa = 5
+    else:
+        dfa = -1
+    return dfa
+
+
+def state6(c):
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    accept_end = {"f": "f", "F": "F"}
+    if c in accept_nums:
+        dfa = 6
+    elif c in accept_end:
+        dfa = 5
+    else:
+        dfa = -1
+    return dfa
+
+
+# accept state
+def state5(c):
+    accept_end = {"f": "f", "F": "F"}
+    if c in accept_end:
+        dfa = 5
+    return dfa
+
+
+def isAccepted(String):
+    # store length of Stringing
+    l = len(String)
+
+    # dfa tells the number associated
+    # with the present dfa = state
+    dfa = 0
+    if String[0] == "_":
+        return False
+    elif String[0] == "." and l == 1:
+        return False
+
+    for i in range(l):
+        if dfa == 0:
+            dfa = start(String[i])
+
+        elif dfa == 1:
+            dfa = state1(String[i])
+
+        elif dfa == 2:
+            dfa = state2(String[i])
+
+        elif dfa == 3:
+            dfa = state3(String[i])
+
+        elif dfa == 4:
+            dfa = state4(String[i])
+
+        elif dfa == 5:
+            dfa = state5(String[i])
+
+        elif dfa == 6:
+            dfa = state6(String[i])
+
         else:
-            return 'Rejected'
-    except:
-        return 'Rejected'
-print('Dfa of 101+ ',accepts(dfa,0,{3},'10101111000')) #Accepted
+            return 0
 
-print('Dfa of 001+ ',accepts(dfa,0,{3},'00101010101')) #Accepted
+    if dfa == 6 or dfa == 4 or dfa == 5:
+        return True
+    else:
+        return False
 
+
+
+def main(input_string):
+
+    if isAccepted(input_string):
+        print("ACCEPTED")
+    else:
+        print("NOT ACCEPTED")
 
 
 if __name__ == '__main__':
     again = True
+    print("enter 'q' or 'quit' to exit")
     while again:
         user_input = input('Please enter your floating point literal: ')
-        again = main(user_input)
+        main(user_input)
+        if user_input == 'q' or user_input == "quit":
+            again = False

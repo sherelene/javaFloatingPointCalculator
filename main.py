@@ -1,5 +1,5 @@
+
 # This function is for the dfa = starting state
-# dfa = state (zeroth) of DFA
 def start(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
@@ -16,8 +16,10 @@ def start(c):
     return dfa, 0
 
 
-# This function is for the next state after the start state
-# dfa = state of DFA
+# This function is for the next state after the start state if start state was a 0-9
+# Accepts input 0-9 returns to itself
+# Accepts e, E next state 3
+# Accepts f, f next state 5 -> accept/end state
 def state1(c):
     dot = "."
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
@@ -42,7 +44,9 @@ def state1(c):
 
 
 # This function next state if previous state was a "."
-# dfa = state of DFA
+# Accepts input 0-9 returns to itself
+# Accepts e, E next state 3
+# Accepts f, f next state 5 -> accept/end state
 def state2(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
@@ -62,8 +66,8 @@ def state2(c):
     return dfa, 0
 
 
-# This function is for the third
-# dfa = state of DFA
+# This function is for after an e, E
+# Required input (0-9, +,or -) next state 6
 def state3(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
@@ -79,7 +83,9 @@ def state3(c):
     return dfa, 0
 
 
-# dfa if number was found after decimal
+# This function is for the next state after the start state if start state was a .
+# Accepts input 0-9 next state 2
+# Accepts f, f next state 5 -> end state
 def state4(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
@@ -95,15 +101,20 @@ def state4(c):
     return dfa, 0
 
 
-# accept state
+# Accepts only f, F- accept/end state
 def state5(c):
     accept_end = {"f": "f", "F": "F"}
     if c in accept_end:
         dfa = 5
         return dfa, accept_end[c]
+    else:
+        dfa = -1
     return dfa, 0
 
 
+# This function is only called if there is an exponent and after state 3
+# Accepts input 0-9 returns to itself
+# Accepts f, f next state 5 -> end state
 def state6(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
@@ -122,6 +133,7 @@ def state6(c):
 def isAccepted(String):
     # store length of Stringing
     length = len(String)
+    # initialize variables and array for converting to float
     characters = []
     cnt = 0
     e_found = False
@@ -134,11 +146,14 @@ def isAccepted(String):
     # dfa tells the number associated
     # with the present dfa = state
     dfa = 0
+
+    # Some fail safes if input is a _ or . only
     if String == "_":
         return False, 0
     elif String == ".":
         return False, 0
 
+    # DFA to determine if input is acceptable
     for i in range(length):
         if dfa == 0:
             dfa, num = start(String[i])
@@ -157,78 +172,94 @@ def isAccepted(String):
         else:
             return False, 0
 
-        # if "_" is found in input string, it is ignored
+        # if "_" is the current character, it is ignored
         if "_" == num:
             continue
-            # saves index where e or E is found
+        # saves index where . is found and adds to character array
         elif "." == num:
             dot_index = cnt
             dot_found = True
             characters.append(num)
+        # saves index where e or E is found and adds to character array
         elif "e" == num or "E" == num:
             e_index = cnt
             e_found = True
             characters.append(num)
+        # if "_" is the current character, it is ignored
         elif "+" == num:
             continue
+        # if negative it means it is an accepted negative which means it is a negative
+        # found after the exponent. Store minus_found as True
         elif "-" == num:
             minus_found = True
+        # if "f" or "F" is the current character, it is ignored
         elif "f" == num or "F" == num:
             continue
-        else:
+        else:  # numbers are added to character array to be converted to a float
             characters.append(num)
+
+        # keeps track of character array indexes
         cnt = cnt + 1
 
-    # accepted states
+    # accepted states of the dfa
     if dfa == 6 or dfa == 4 or dfa == 5 or dfa == 2:
-        number = get_num(characters, e_index, e_found, dot_index, dot_found, minus_found, minus_index)
+        # function to take character array and transform into a float
+        number = get_num(characters, e_index, e_found, dot_index, dot_found, minus_found)
         return True, number
     else:
         return False, 0
 
 
-def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found, minus_index):
+def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found):
+    # initialize variables for help converting to float
     length = len(characters)
     sum = 0
     whole_num = 0
     decimals = 0
     ind = 0
+    power = 0
 
-    # if decimal number
+    # if input was a decimal number
     if dot_found:
-        before_dot = dot_index - 1  #minus two because starts from 10^0 and not 10^1
+        # index for adding numbers before and after the dot
+        before_dot = dot_index - 1
         after_dot = -1
 
-        #gets the numbers before the decimals
+        # gets the numbers before the decimals
         for i in range(before_dot, -1, -1):
             whole_num = whole_num + (characters[ind] * 10 ** i)
             ind = ind + 1
-            print("whole", whole_num)
 
         #if theres numbers after the decimals and theres an exponent
         if dot_index != length and e_found:
+            # starting from after the dot until the exponent
             for j in range(dot_index + 1, e_index):
-                decimals = decimals + characters[j] * 10 ** after_dot  #adds numbers after decimals to whole number
+                # after_dot is 10 ^-1
+                # so if the number is .123, it will be 1 x 10 ^ -1 = .1
+                decimals = decimals + characters[j] * 10 ** after_dot
+                # then it will be after_dot = -1 - 1 =  2 x 10 ^-2 = . 02
                 after_dot = after_dot - 1
+
+                # since exponent IS found, exp_length is length of exponent eg. e10 is length 2
+                # eg 123.45e2 is (8(length)- 6(e_index)) - 2 = 0 therefore exp_length has only 10^0
+                # eg 123.45e25 is (9(length)- 6(e_index)) - 2 = 1 therefore exp_length has 10^0 and 10^1
                 exp_length = (length - e_index) - 2
 
                 #if negative sign found with exponent
                 if minus_found:
                     for k in range(e_index + 1, length):
-                        power = characters[k] * 10 ** exp_length
+                        power = power +  characters[k] * 10 ** exp_length
                         exp_length = exp_length + 1
                         power = -power
                 else:
                     for k in range(e_index + 1, length):
-                        power = characters[k] * 10 ** exp_length
+                        power = power + characters[k] * 10 ** exp_length
                         exp_length = exp_length + 1
 
         elif dot_index != length:
             for j in range(dot_index+1, length):
                 decimals = decimals + characters[j] * 10 ** after_dot
                 after_dot = after_dot - 1
-                print(characters[j] * 10 ** after_dot)
-                print("dd", decimals)
             sum = whole_num + decimals
         else:
             sum = whole_num + decimals
@@ -245,7 +276,7 @@ def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found, min
             decimals = decimals + characters[ind] * 10 ** i
             ind = ind + 1
         for j in range(e_index+1, length):
-            power = characters[j] * 10 ** exp_length
+            power = power + characters[j] * 10 ** exp_length
             exp_length = exp_length + 1
         sum = (whole_num + decimals) * 10 ** power
 
@@ -257,6 +288,16 @@ def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found, min
     return sum
 
 
+def sanity_check():
+    test_num = ['', '123', '123f', '123e', '123e1', '123e1f', '+123f', '-123f',
+                '123.', '.', '123..2', '123.2.e1', '_', '_1__2.', '1__2.', '1__2_.',
+                '123._2', '123.2_e1', '123.2_e_1', '123.3e1', '.123e4', '5.432e-2', '1111111111.0e-11']
+
+    for element in test_num:
+        print(element)
+        main(element)
+
+
 def main(input_string):
     accepted, number = isAccepted(input_string)
     if accepted:
@@ -264,14 +305,6 @@ def main(input_string):
     else:
         print("reject")
 
-def sanity_check():
-    test_num = ['', '123', '123f', '123e', '123e1', '123e1f', '+123f', '-123f',
-                '123.', '.', '123..2', '123.2.e1', '_', '_1__2.', '1__2.', '1__2_.',
-                '123._2', '123.2_e1', '123.2_e_1', '123.3e1', '.123e4', '5.432e-2']
-
-    for element in test_num:
-        print(element)
-        main(element)
 
 if __name__ == '__main__':
     again = True

@@ -1,4 +1,3 @@
-
 # This function is for the dfa = starting state
 def start(c):
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
@@ -227,10 +226,13 @@ def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found):
 
         # gets the numbers before the decimals
         for i in range(before_dot, -1, -1):
+            # eg 123.45e2 has dot index 3. before_dot = 2
+            # subtracts 1 from before_dot with every iteration
+            # iterates 1 x 10^2 + 2 x 10^1 + 3 x 10 ^0 = 123
             whole_num = whole_num + (characters[ind] * 10 ** i)
             ind = ind + 1
 
-        #if theres numbers after the decimals and theres an exponent
+        # if theres numbers after the decimals and theres an exponent
         if dot_index != length and e_found:
             # starting from after the dot until the exponent
             for j in range(dot_index + 1, e_index):
@@ -240,58 +242,72 @@ def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found):
                 # then it will be after_dot = -1 - 1 =  2 x 10 ^-2 = . 02
                 after_dot = after_dot - 1
 
-                # since exponent IS found, exp_length is length of exponent eg. e10 is length 2
-                # eg 123.45e2 is (8(length)- 6(e_index)) - 2 = 0 therefore exp_length has only 10^0
-                # eg 123.45e25 is (9(length)- 6(e_index)) - 2 = 1 therefore exp_length has 10^0 and 10^1
-                exp_length = (length - e_index) - 2
+            # since exponent IS found, exp_length is length of exponent eg. e10 is length 2
+            # eg 123.45e2 is (8(length)- 6(e_index)) - 2 = 0 therefore exp_length has only 10^0
+            # eg 123.45e25 is (9(length)- 6(e_index)) - 2 = 1 therefore exp_length has 10^0 and 10^1
+            exp_length = (length - e_index) - 2
+            ind = e_index + 1
+            for k in range(exp_length, -1, -1):
+                power = power + (characters[ind] * 10 ** k)
+                ind = ind + 1
+            if minus_found:
+                # if there is a negative in exponent then make power negative
+                power = -power
+            sum = (whole_num + decimals) * 10 ** power
 
-                #if negative sign found with exponent
-                if minus_found:
-                    for k in range(e_index + 1, length):
-                        power = power +  characters[k] * 10 ** exp_length
-                        exp_length = exp_length + 1
-                        power = -power
-                else:
-                    for k in range(e_index + 1, length):
-                        power = power + characters[k] * 10 ** exp_length
-                        exp_length = exp_length + 1
-
+        # if number does not end with a dot eg 123. or 42. and does not have exponent
         elif dot_index != length:
-            for j in range(dot_index+1, length):
+            for j in range(dot_index + 1, length):
                 decimals = decimals + characters[j] * 10 ** after_dot
+                # after dot is 10 ^-1 and iterates to 10^-2, 10^-3, etc
                 after_dot = after_dot - 1
             sum = whole_num + decimals
         else:
             sum = whole_num + decimals
 
-        if e_found:
-            sum = (whole_num + decimals) * 10 ** power
-        else:
-            sum = whole_num + decimals
-
+    # if only exponent is found and it is a whole number
     elif e_found:
         ind = 0
-        exp_length = (length - e_index) - 2
-        for i in range(e_index-1, -1, -1):
-            decimals = decimals + characters[ind] * 10 ** i
-            ind = ind + 1
-        for j in range(e_index+1, length):
-            power = power + characters[j] * 10 ** exp_length
-            exp_length = exp_length + 1
-        sum = (whole_num + decimals) * 10 ** power
 
+        # get number before exponent
+        for i in range(e_index - 1, -1, -1):
+            # eg 123.45e2 has dot index 3. before_dot = 2
+            # subtracts 1 from before_dot with every iteration
+            # iterates 1 x 10^2 + 2 x 10^1 + 3 x 10 ^0 = 123
+            whole_num = whole_num + characters[ind] * 10 ** i
+            ind = ind + 1
+
+        exp_length = (length - e_index) - 2
+        ind = e_index + 1
+        # since exponent IS found, exp_length is length of exponent eg. e10 is length 2
+        # eg 123.45e2 is (8(length)- 6(e_index)) - 2 = 0 therefore exp_length has only 10^0
+        # eg 123.45e25 is (9(length)- 6(e_index)) - 2 = 1 therefore exp_length has 10^0 and 10^1
+        for k in range(exp_length, -1, -1):
+            power = power + (characters[ind] * 10 ** k)
+            ind = ind + 1
+        if minus_found:
+            # if there is a negative in exponent then make power negative
+            power = -power
+        sum = whole_num * 10 ** power
+
+    # if number is a whole number with no exponents
+    # transforms array to number
+    # eg 123.45e2 has dot index 3. before_dot = 2
+    # subtracts 1 from before_dot with every iteration
+    # iterates 1 x 10^2 + 2 x 10^1 + 3 x 10 ^0 = 123
     else:
-        for i in range(length-1, -1, -1):
+        for i in range(length - 1, -1, -1):
             sum = sum + characters[ind] * 10 ** i
             ind = ind + 1
 
     return sum
 
 
+# function to call as a sanity check and to ensure code is correct
 def sanity_check():
     test_num = ['', '123', '123f', '123e', '123e1', '123e1f', '+123f', '-123f',
                 '123.', '.', '123..2', '123.2.e1', '_', '_1__2.', '1__2.', '1__2_.',
-                '123._2', '123.2_e1', '123.2_e_1', '123.3e1', '.123e4', '5.432e-2', '1111111111.0e-11']
+                '123._2', '123.2_e1', '123.2_e_1', '123.3e1', '123456789.12e-11']
 
     for element in test_num:
         print(element)
@@ -310,16 +326,13 @@ if __name__ == '__main__':
     again = True
 
     # Function to check code and make sure it works fine
-    sanity_check()
+    # sanity_check()
 
+    # infinite loop asking user to enter a number
+    # exits when entered q or quit
     print("enter 'q' or 'quit' to exit")
     while again:
-          user_input = input('Please enter your floating point literal: ')
-          main(user_input)
-          if user_input == 'q' or user_input == "quit":
-              again = False
-
-
-
-
-
+        user_input = input('Please enter your floating point literal: ')
+        main(user_input)
+        if user_input == 'q' or user_input == "quit":
+            again = False

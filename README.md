@@ -6,7 +6,7 @@ note*: theres been some test cases where python returns trailing zeroes and a si
 
 eg: .123e4 returns 1230.0000000000002 
 
-debugging showed the program will take 1 to be 1 x 10^-1 = 0.1, 2 x 10^-2 = 0.02, and 3 x 10^-3 = .003 to be transformed
+debugging showed the program will transform the digits after the dot to 1 x 10^-1 = 0.1, 2 x 10^-2 = 0.02, and 3 x 10^-3 = .003 
 
 however adding 0.1 and 0.02 it becomes 0.120000000000001 
 

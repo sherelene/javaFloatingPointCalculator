@@ -2,7 +2,7 @@
 
 This program allows a user to input a number and if it is a java decimal floating point number, the program will return the number. The numbers are checked character by character. 
 
-note*: theres been some test cases where python returns trailing zeroes and a one. e
+note*: theres been some test cases where python returns trailing zeroes and a single one. 
 
 eg: .123e4 returns 1230.0000000000002 
 

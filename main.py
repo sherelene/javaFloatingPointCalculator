@@ -333,6 +333,7 @@ if __name__ == '__main__':
     print("enter 'q' or 'quit' to exit")
     while again:
         user_input = input('Please enter your floating point literal: ')
-        main(user_input)
         if user_input == 'q' or user_input == "quit":
             again = False
+        else:
+            main(user_input)

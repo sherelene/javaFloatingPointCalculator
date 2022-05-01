@@ -24,7 +24,7 @@ def state1(c):
     underscores = {"_": "_"}
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
-    accept_chars = {"e": "E"}
+    accept_chars = {"e": "e", "E": "E"}
     accept_end = {"f": "f", "F": "F"}
     if c in accept_nums:
         dfa = 1
@@ -77,7 +77,7 @@ def state2(c):
     underscores = {"_": "_"}
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
-    accept_chars = {"e": "E"}
+    accept_chars = {"e": "e", "E": "E"}
     accept_end = {"f": "f", "F": "F"}
     if c in accept_nums:
         dfa = 2
@@ -415,7 +415,7 @@ if __name__ == '__main__':
     again = True
 
     # Function to check code and make sure it works fine
-    sanity_check()
+    #sanity_check()
 
     # infinite loop asking user to enter a number
     # exits when entered q or quit

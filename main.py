@@ -12,7 +12,7 @@ def start(c):
     # invalid symbol
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
 
 
 # This function is for the next state after the start state if start state was a 0-9
@@ -21,15 +21,16 @@ def start(c):
 # Accepts f, f next state 5 -> accept/end state
 def state1(c):
     dot = "."
+    underscores = {"_": "_"}
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
-                   "7": 7, "8": 8, "9": 9, "_": "_"}
+                   "7": 7, "8": 8, "9": 9}
     accept_chars = {"e": "E"}
     accept_end = {"f": "f", "F": "F"}
     if c in accept_nums:
         dfa = 1
         return dfa, accept_nums[c]
     elif c == dot:
-        dfa = 2
+        dfa = 22
         return dfa, dot
     elif c in accept_chars:
         dfa = 3
@@ -37,16 +38,16 @@ def state1(c):
     elif c in accept_end:
         dfa = 5
         return dfa, accept_end[c]
+    elif c in underscores:
+        dfa = 7
+        return dfa, underscores[c]
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
 
 
-# This function next state if previous state was a "."
-# Accepts input 0-9 returns to itself
-# Accepts e, E next state 3
-# Accepts f, f next state 5 -> accept/end state
-def state2(c):
+def state22(c):
+    underscores = {"_": "_"}
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
     accept_chars = {"e": "E"}
@@ -60,9 +61,39 @@ def state2(c):
     elif c in accept_end:
         dfa = 5
         return dfa, accept_end[c]
+    elif c in underscores:
+        dfa = -1
+        return dfa, underscores[c]
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
+
+
+# This function next state if previous state was a "."
+# Accepts input 0-9 returns to itself
+# Accepts e, E next state 3
+# Accepts f, f next state 5 -> accept/end state
+def state2(c):
+    underscores = {"_": "_"}
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    accept_chars = {"e": "E"}
+    accept_end = {"f": "f", "F": "F"}
+    if c in accept_nums:
+        dfa = 2
+        return dfa, accept_nums[c]
+    elif c in accept_chars:
+        dfa = 3
+        return dfa, accept_chars[c]
+    elif c in accept_end:
+        dfa = 5
+        return dfa, accept_end[c]
+    elif c in underscores:
+        dfa = 7
+        return dfa, underscores[c]
+    else:
+        dfa = -1
+    return dfa, -1
 
 
 # This function is for after an e, E
@@ -79,7 +110,7 @@ def state3(c):
         return dfa, accept_nums[c]
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
 
 
 # This function is for the next state after the start state if start state was a .
@@ -97,7 +128,7 @@ def state4(c):
         return dfa, accept_end[c]
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
 
 
 # Accepts only f, F- accept/end state
@@ -108,13 +139,14 @@ def state5(c):
         return dfa, accept_end[c]
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
 
 
 # This function is only called if there is an exponent and after state 3
 # Accepts input 0-9 returns to itself
 # Accepts f, f next state 5 -> end state
 def state6(c):
+    underscores = {"_": "_"}
     accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
                    "7": 7, "8": 8, "9": 9}
     accept_end = {"f": "f", "F": "F"}
@@ -124,10 +156,58 @@ def state6(c):
     elif c in accept_end:
         dfa = 5
         return dfa, accept_end[c]
+    elif c in underscores:
+        dfa = 8
+        return dfa, underscores[c]
     else:
         dfa = -1
-    return dfa, 0
+    return dfa, -1
 
+# state only for underscores before decimals
+def state7(c):
+    underscores = {"_": "_"}
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    if c in accept_nums:
+        dfa = 1
+        return dfa, accept_nums[c]
+    elif c in underscores:
+        dfa = 7
+        return dfa, underscores[c]
+    else:
+        dfa = -1
+        return dfa, -1
+
+# state for underscores after exponent part
+def state8(c):
+    underscores = {"_": "_"}
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    if c in accept_nums:
+        dfa = 6
+        return dfa, accept_nums[c]
+    elif c in underscores:
+        dfa = 8
+        return dfa, underscores[c]
+    else:
+        dfa = -1
+        return dfa, -1
+
+
+# state only for underscores after decimals
+def state9(c):
+    underscores = {"_": "_"}
+    accept_nums = {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 5, "6": 6,
+                   "7": 7, "8": 8, "9": 9}
+    if c in accept_nums:
+        dfa = 1
+        return dfa, accept_nums[c]
+    elif c in underscores:
+        dfa = 9
+        return dfa, underscores[c]
+    else:
+        dfa = -1
+        return dfa, -1
 
 def isAccepted(String):
     # store length of Stringing
@@ -148,9 +228,9 @@ def isAccepted(String):
 
     # Some fail safes if input is a _ or . only
     if String == "_":
-        return False, 0
+        return False, -1
     elif String == ".":
-        return False, 0
+        return False, -1
 
     # DFA to determine if input is acceptable
     for i in range(length):
@@ -168,6 +248,14 @@ def isAccepted(String):
             dfa, num = state5(String[i])
         elif dfa == 6:
             dfa, num = state6(String[i])
+        elif dfa == 7:
+            dfa, num = state7(String[i])
+        elif dfa == 8:
+            dfa, num = state8(String[i])
+        elif dfa == 9:
+            dfa, num = state9(String[i])
+        elif dfa == 22:
+            dfa, num = state22(String[i])
         else:
             return False, 0
 
@@ -184,7 +272,7 @@ def isAccepted(String):
             e_index = cnt
             e_found = True
             characters.append(num)
-        # if "_" is the current character, it is ignored
+        # if "+" is the current character, it is ignored
         elif "+" == num:
             continue
         # if negative it means it is an accepted negative which means it is a negative
@@ -200,8 +288,9 @@ def isAccepted(String):
         # keeps track of character array indexes
         cnt = cnt + 1
 
+
     # accepted states of the dfa
-    if dfa == 6 or dfa == 4 or dfa == 5 or dfa == 2:
+    if dfa == 6 or dfa == 4 or dfa == 5 or dfa == 2 or dfa == 1 or dfa == 22:
         # function to take character array and transform into a float
         number = get_num(characters, e_index, e_found, dot_index, dot_found, minus_found)
         return True, number
@@ -305,7 +394,7 @@ def get_num(characters, e_index, e_found, dot_index, dot_found, minus_found):
 
 # function to call as a sanity check and to ensure code is correct
 def sanity_check():
-    test_num = ['', '123', '123f', '123e', '123e1', '123e1f', '+123f', '-123f',
+    test_num = ['', '123', '1_1.2_1', '1.1_1e1_1', '1_1.1_', '123f', '123e', '123e1', '123e1f', '+123f', '-123f',
                 '123.', '.', '123..2', '123.2.e1', '_', '_1__2.', '1__2.', '1__2_.',
                 '123._2', '123.2_e1', '123.2_e_1', '123.3e1', '123456789.12e-11']
 
@@ -326,7 +415,7 @@ if __name__ == '__main__':
     again = True
 
     # Function to check code and make sure it works fine
-    # sanity_check()
+    sanity_check()
 
     # infinite loop asking user to enter a number
     # exits when entered q or quit
